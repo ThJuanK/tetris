@@ -236,7 +236,8 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
     
     print_screen(new_screen)
     return new_screen, new_estadoRotacion
-    
+
+
 t = threading.Timer(interval=3, function=auto_down)
 t.start()
 tetris()

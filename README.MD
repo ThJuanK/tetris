@@ -1,5 +1,5 @@
 # tetris
-## Nuevo videojuego con python, lo más vanilla posible sin librerías como pygame.
+### Otro videojuego con python, lo más vanilla posible sin librerías como pygame.
 
 Está creado con la finalidad de practicar y añadir distintos proyectos. 
 para jugar, descargar el repositorio. Solo es necesaria una librería para acceder al teclado, para instalarla solo es necesario ejecutar 
@@ -13,3 +13,10 @@ Y ejecutar el archivo main.py con python. La libreria keyboard, desde un sistema
 ```
 $ sudo python3 main.py
 ```
+
+## Controles 
+
+S - ↓ : Mover pieza abajo
+D - → : Mover pieza derecha
+A - ← : Mover pieza izquierda 
+Espacio : Rotar pieza
