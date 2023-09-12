@@ -5,7 +5,7 @@ import threading
 import time
 import random
 
-class Ficha(Enum):
+class Piece(Enum):
     I = 0
     S = 1
     L = 2
@@ -21,20 +21,9 @@ class Move(Enum):
     ROTATE = 3
     UP = 4
 
-screen = [
-        ["🔳", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔳", "🔳", "🔳", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-        ["🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲", "🔲"],
-    ]
-    
+screen = new_screen = [["🔲"] * 10 for _ in range(10) ]
 estadoRotacion = 0
+actualPiece = Piece.S
 
 def auto_down():
     global screen
@@ -46,8 +35,9 @@ def auto_down():
 def tetris():
     global screen
     global estadoRotacion
-    print_screen(screen)
+    global actual_piece
     
+    screen=generate_next_piece(screen)
 
     while True:
         event = keyboard.read_event()
@@ -60,45 +50,108 @@ def tetris():
                 case "d" | "rigth": 
                     screen, estadoRotacion = move_piece(screen, Move.RIGTH, estadoRotacion)
                 case "space" | "left": 
-                    pass #screen, estadoRotacion = move_piece(screen, Move.ROTATE, estadoRotacion)
+                    screen, estadoRotacion = move_piece(screen, Move.ROTATE, estadoRotacion)
                     
-def generate_next_piece(screen):
-    pieces = [
-        [1, 0, 0,
-         1, 0, 0,
-         1, 0, 0], # I
-        [1, 1, 0,
-         1, 1, 0,
-         0, 0, 0], # O
-        [0, 1, 1,
-         1, 1, 0,
-         0, 0, 0], # S
-        [1, 1, 0,
-         0, 1, 1,
-         0, 0, 0], # Z
-        [0, 1, 0,
-         0, 1, 0,
-         1, 1, 0], # J
-        [0, 1, 0,
-         0, 1, 0,
-         0, 1, 1], # L
-        [0, 1, 0,
-         1, 1, 1,
-         0, 0, 0], # T
-    ]
-    
-    
+
+def piece_below(screen):
     for row_index_2, row_2 in enumerate(screen):
         for column_index_2, pixel_2 in enumerate(row_2):
             if pixel_2 == "🔳":
                 screen[row_index_2][column_index_2] = "⬛"
+                
+    return screen
+
+# lista de modificaciones por pixel de cada pieza
+rotaciones = {
+    Piece.I: [
+        [(0, 0), (-1 , 1), (-2, 2)],
+        [(2, 2), (1 , 1), (0, 0)],
+        [(2, -2), (1 , -1), (0, 0)],
+        [(-2, 0), (-1 , -1), (0, -2)],
+    ],
+    Piece.O: [
+        [(0, 0), (0 , 0), (0, 0), (0, 0)] for _ in range(4)
+    ],
+    Piece.S: [
+        [(1, -1), (0 , -2), (1, 1), (0, 0)],
+        [(1, 0), (0 , 1), (-1, 0), (-2, 1)],              
+        [(1, -1), (0 , -2), (1, 1), (0, 0)],           
+        [(1, 0), (0 , 1), (-1, 0), (-2, 1)],                
+    ],
+    Piece.Z: [
+        [(0, 1), (1, 0), (0, -1), (1, -2)],     
+        [(1, 1), (-1 , 1), (0, 0), (-2, 0)],               
+        [(0, 1), (1, 0), (0, -1), (1, -2)],     
+        [(1, 1), (-1 , 1), (0, 0), (-2, 0)],               
+    ],
+    Piece.Z: [
+        [(0, 1), (1, 0), (0, -1), (1, -2)],
+        [(1, 1), (-1 , 1), (0, 0), (-2, 0)],
+        [(0, 1), (1, 0), (0, -1), (1, -2)],
+        [(1, 1), (-1 , 1), (0, 0), (-2, 0)],
+    ],
+    Piece.J: [
+        [(1, 1), (0, 0), (-2, 0), (-1, -1)],
+        [(0, 1), (-1, 0), (0, -1), (1, -2)], 
+        [(0, 2), (1, 1), (-1, 1), (-2, 0)],
+        [(0, 1), (1, 0), (2, -1), (1, -2)],
+    ],
+    Piece.L: [
+        [(1, 1), (0, 0), (-1, -1), (0, -2)],
+        [(0, 1), (1, 0), (2, -1), (-1, 0)],
+        [(0, 1), (1, 0), (0, -1), (-1, -2)],
+        [(2, 0), (-1, 1), (0, 0), (1, -1)],
+    ],
+    Piece.T: [
+        [(1, 1), (-1, 1), (0, 0), (1, -1)],
+        [(1, 1), (0, 0), (1, -1), (-1, -1)],
+        [(-1, 1), (0, 0), (1, -1), (-1, -1)],
+        [(1, 1), (-1, 1), (0, 0), (-1, -1)],
+    ]
+}
+
+def generate_next_piece(screen):
+    
+    global actualPiece
+    
+    pieces = {
+        Piece.I: 
+        [1, 0, 0,
+         1, 0, 0,
+         1, 0, 0], # I
+        Piece.O:
+        [1, 1, 0, 
+         1, 1, 0,
+         0, 0, 0], # O
+        Piece.S:
+        [0, 1, 1,
+         1, 1, 0,
+         0, 0, 0], # S
+        Piece.Z:
+        [1, 1, 0,
+         0, 1, 1,
+         0, 0, 0], # Z
+        Piece.J:
+        [0, 1, 0,
+         0, 1, 0,
+         1, 1, 0], # J
+        Piece.L:
+        [0, 1, 0,
+         0, 1, 0,
+         0, 1, 1], # L
+        Piece.T:
+        [0, 1, 0,
+         1, 1, 1,
+         0, 0, 0], # T
+    }
     
     j_inicial = random.randint(0, 7)
     j = j_inicial
     i = 0
+    
+    actualPiece = random.choice(list(Piece))
                   
-    for pixel in random.choice(pieces):
-
+    for pixel in pieces[actualPiece]:
         print(f"{i}, {j} \n{pixel} \n")
 
         print_screen(screen, False)
@@ -132,11 +185,7 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
                 new_screen[row_index][column_index] = "⬛"
     
     g_piece = False
-    rotacion = [
-        (0, 2), (1, 1), (2, 0),
-        (-1, 1), (0, 0), ()
-    ]
-            
+         
     n_pieza = 0
     new_estadoRotacion = estadoRotacion
     
@@ -169,13 +218,14 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
                         new_column_index = column_index 
                         
                     case Move.ROTATE:
-                        new_row_index = row_index + rotacion[new_estadoRotacion][n_pieza][0]
-                        new_column_index =  column_index  + rotacion[new_estadoRotacion][n_pieza][1]
+                        new_row_index = row_index + rotaciones[actualPiece][estadoRotacion][n_pieza][0]
+                        new_column_index =  column_index  + rotaciones[actualPiece][estadoRotacion][n_pieza][1]
                         n_pieza += 1
             
                 if ((0 <= new_row_index <= 9) and ( 0 <= new_column_index <= 9)):
                     new_screen[new_row_index][new_column_index] = "🔳"
                     if new_row_index == len(screen) - 1 or new_screen[new_row_index + 1][new_column_index] == "⬛":
+                        new_screen = piece_below(new_screen)
                         g_piece = True
                 else:
                     return screen, estadoRotacion
@@ -187,6 +237,6 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
     print_screen(new_screen)
     return new_screen, new_estadoRotacion
     
-# t = threading.Timer(interval=3, function=auto_down)
-# t.start()
+t = threading.Timer(interval=3, function=auto_down)
+t.start()
 tetris()
