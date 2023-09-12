@@ -16,7 +16,10 @@ $ sudo python3 main.py
 
 ## Controles 
 
-S - ↓ : Mover pieza abajo
+S - ↓ : Mover pieza abajo 
+
 D - → : Mover pieza derecha
+
 A - ← : Mover pieza izquierda 
+
 Espacio : Rotar pieza
