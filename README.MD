@@ -13,6 +13,13 @@ Y ejecutar el archivo main.py con python. La libreria keyboard, desde un sistema
 ```
 $ sudo python3 main.py
 ```
+# Instrucciones
+
+## Puntos
+La cantidad de puntos que se obtienen por linea: 
+- 1 línea: 100 puntos. 
+- 2 líneas: 200 puntos. 
+- 3 líneas: 400 puntos.
 
 ## Controles 
 

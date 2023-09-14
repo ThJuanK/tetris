@@ -1,28 +1,31 @@
 from os import system
 import time
 
-def print_screen(screen, clean = True):
+def print_screen(screen, points, clean = True):
     if clean:
         system('cls')
-    for row in screen:
-        print( "".join( map( str, row ) ),)
+    for i, row in enumerate(screen):
+        print( "".join( map( str, row ) if i != 3 else f"{''.join( map( str, row ))}  score: {points}"),) 
     print("\n")
     
-def clean_row(screen, row_index):
-    print(row_index)
+def clean_row(screen, row_index, points):
+    
     for x in range(10):
         screen[row_index][x] = "🔲"
-        print_screen(screen)
+        print_screen(screen, points)
     
-    screen.pop(9)
+    screen.pop(row_index)
     screen.insert(0, ["🔲"]*10)
     
     time.sleep(0.5)
-    print_screen(screen)
+    print_screen(screen, points)
     
     return screen
 
-def piece_below(screen):
+def piece_below(screen, points):
+    contador_de_lineas = 0
+    points = 0
+    
     for row_index, row in enumerate(screen):
         for column_index, pixel in enumerate(row):
             if pixel == "🔳":
@@ -30,6 +33,11 @@ def piece_below(screen):
     
     for row_index, row in enumerate(screen):
         if all(pixel == "⬛" for pixel in row):
-            screen = clean_row(screen, row_index)
-      
-    return screen
+            contador_de_lineas += 1
+            screen = clean_row(screen, row_index, points)
+    
+    match contador_de_lineas:
+        case 1 | 2: points = 100 * contador_de_lineas
+        case 3: points = 400
+    
+    return screen, points
