@@ -1,5 +1,8 @@
 from enum import Enum
-from os import system
+
+from functions.functions import *
+
+
 import keyboard
 import threading
 import time
@@ -105,6 +108,7 @@ def tetris():
                     
 def game_over():
     system("cls")
+    t.cancel()
     print(
         """
         ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
@@ -126,14 +130,6 @@ def game_over():
         """
     )
     return False
-
-def piece_below(screen):
-    for row_index_2, row_2 in enumerate(screen):
-        for column_index_2, pixel_2 in enumerate(row_2):
-            if pixel_2 == "🔳":
-                screen[row_index_2][column_index_2] = "⬛"
-                
-    return screen
 
 def generate_next_piece(screen):
     
@@ -194,13 +190,6 @@ def generate_next_piece(screen):
     
     return screen
 
-def print_screen(screen, clean = True):
-    if clean:
-        system('cls')
-    for row in screen:
-        print( "".join( map( str, row ) ),)
-    print("\n")
-
 def move_piece(screen, move: Move, estadoRotacion: int = 0):
     new_screen = [["🔲"] * 10 for _ in range(10) ]
     
@@ -208,6 +197,7 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
         for column_index, pixel in enumerate(row):
             if pixel == "⬛":
                 new_screen[row_index][column_index] = "⬛"
+                
     
     g_piece = False
          
@@ -250,12 +240,12 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
                 if ((0 <= new_row_index <= 9) and ( 0 <= new_column_index <= 9)):
                     new_screen[new_row_index][new_column_index] = "🔳"
                     if new_row_index == len(screen) - 1 or new_screen[new_row_index + 1][new_column_index] == "⬛":
-                        new_screen = piece_below(new_screen)
                         g_piece = True
                 else:
                     return screen, estadoRotacion
     
     if g_piece:
+        new_screen = piece_below(new_screen)
         new_screen = generate_next_piece(new_screen)
         return new_screen, 0
     
