@@ -25,42 +25,6 @@ screen = new_screen = [["🔲"] * 10 for _ in range(10) ]
 estadoRotacion = 0
 actualPiece = Piece.S
 
-def auto_down():
-    global screen
-    global estadoRotacion
-    while True:
-        screen, estadoRotacion = move_piece(screen, Move.DOWN, estadoRotacion)
-        time.sleep(2)
-
-def tetris():
-    global screen
-    global estadoRotacion
-    global actual_piece
-    
-    screen=generate_next_piece(screen)
-
-    while True:
-        event = keyboard.read_event()
-        if event.event_type == "down":
-            match event.name:
-                case "a" | "flecha izquierda": 
-                    screen, estadoRotacion = move_piece(screen, Move.LEFT, estadoRotacion)
-                case "s" | "down": 
-                    screen, estadoRotacion = move_piece(screen, Move.DOWN, estadoRotacion)
-                case "d" | "rigth": 
-                    screen, estadoRotacion = move_piece(screen, Move.RIGTH, estadoRotacion)
-                case "space" | "left": 
-                    screen, estadoRotacion = move_piece(screen, Move.ROTATE, estadoRotacion)
-                    
-
-def piece_below(screen):
-    for row_index_2, row_2 in enumerate(screen):
-        for column_index_2, pixel_2 in enumerate(row_2):
-            if pixel_2 == "🔳":
-                screen[row_index_2][column_index_2] = "⬛"
-                
-    return screen
-
 # lista de modificaciones por pixel de cada pieza
 rotaciones = {
     Piece.I: [
@@ -110,6 +74,67 @@ rotaciones = {
     ]
 }
 
+def auto_down():
+    global screen
+    global estadoRotacion
+    while screen != False:
+        screen, estadoRotacion = move_piece(screen, Move.DOWN, estadoRotacion)
+        time.sleep(2)
+    
+    t.cancel()
+
+def tetris():
+    global screen
+    global estadoRotacion
+    global actual_piece
+    
+    screen=generate_next_piece(screen)
+
+    while screen != False:
+        event = keyboard.read_event()
+        if event.event_type == "down":
+            match event.name:
+                case "a" | "flecha izquierda" | "left": 
+                    screen, estadoRotacion = move_piece(screen, Move.LEFT, estadoRotacion)
+                case "s" | "flecha abajo" | "down": 
+                    screen, estadoRotacion = move_piece(screen, Move.DOWN, estadoRotacion)
+                case "d" | "flecha derecha" | "rigth": 
+                    screen, estadoRotacion = move_piece(screen, Move.RIGTH, estadoRotacion)
+                case "space": 
+                    screen, estadoRotacion = move_piece(screen, Move.ROTATE, estadoRotacion)
+                    
+def game_over():
+    system("cls")
+    print(
+        """
+        ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+        ⬜⬛⬛⬛⬛⬜⬜⬜⬛⬜⬜⬜⬛⬛⬜⬜⬜⬛⬛⬜⬜⬛⬛⬛⬛⬜
+        ⬜⬛⬜⬜⬜⬜⬜⬛⬜⬛⬜⬜⬛⬜⬛⬜⬛⬜⬛⬜⬜⬛⬜⬜⬜⬜
+        ⬜⬛⬜⬜⬜⬜⬛⬜⬜⬜⬛⬜⬛⬜⬜⬛⬜⬜⬛⬜⬜⬛⬜⬜⬜⬜
+        ⬜⬛⬜⬛⬛⬜⬛⬛⬛⬛⬛⬜⬛⬜⬜⬛⬜⬜⬛⬜⬜⬛⬛⬛⬛⬜
+        ⬜⬛⬜⬜⬛⬜⬛⬜⬜⬜⬛⬜⬛⬜⬜⬛⬜⬜⬛⬜⬜⬛⬜⬜⬜⬜
+        ⬜⬛⬛⬛⬛⬜⬛⬜⬜⬜⬛⬜⬛⬜⬜⬛⬜⬜⬛⬜⬜⬛⬛⬛⬛⬜
+        ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+        ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+        ⬜⬜⬜⬛⬛⬛⬛⬜⬛⬜⬜⬜⬛⬜⬛⬛⬛⬛⬜⬛⬛⬛⬜⬜⬜⬜
+        ⬜⬜⬜⬛⬜⬜⬛⬜⬛⬜⬜⬜⬛⬜⬛⬜⬜⬜⬜⬛⬜⬜⬛⬜⬜⬜
+        ⬜⬜⬜⬛⬜⬜⬛⬜⬛⬜⬜⬜⬛⬜⬛⬜⬜⬜⬜⬛⬜⬜⬛⬜⬜⬜
+        ⬜⬜⬜⬛⬜⬜⬛⬜⬜⬛⬜⬛⬜⬜⬛⬛⬛⬛⬜⬛⬛⬛⬜⬜⬜⬜
+        ⬜⬜⬜⬛⬜⬜⬛⬜⬜⬛⬜⬛⬜⬜⬛⬜⬜⬜⬜⬛⬜⬛⬜⬜⬜⬜
+        ⬜⬜⬜⬛⬛⬛⬛⬜⬜⬜⬛⬜⬜⬜⬛⬛⬛⬛⬜⬛⬜⬜⬛⬜⬜⬜
+        ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+        """
+    )
+    return False
+
+def piece_below(screen):
+    for row_index_2, row_2 in enumerate(screen):
+        for column_index_2, pixel_2 in enumerate(row_2):
+            if pixel_2 == "🔳":
+                screen[row_index_2][column_index_2] = "⬛"
+                
+    return screen
+
 def generate_next_piece(screen):
     
     global actualPiece
@@ -152,9 +177,9 @@ def generate_next_piece(screen):
     actualPiece = random.choice(list(Piece))
                   
     for pixel in pieces[actualPiece]:
-        print(f"{i}, {j} \n{pixel} \n")
-
-        print_screen(screen, False)
+        
+        if screen[i][j] == "⬛":
+            return game_over()
         
         if pixel == 1:
             screen[i][j] = "🔳"
@@ -238,6 +263,7 @@ def move_piece(screen, move: Move, estadoRotacion: int = 0):
     return new_screen, new_estadoRotacion
 
 
-t = threading.Timer(interval=3, function=auto_down)
+t = threading.Timer(interval=1, function=auto_down)
 t.start()
-tetris()
+tetris()    
+             
